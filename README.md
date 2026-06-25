@@ -1,3 +1,5 @@
+<img width="250" height="250" alt="logo" src="https://github.com/user-attachments/assets/17ebe286-555e-4f4d-a25b-7c263c191acb" />
+
 # Coco Usage Bar
 
 A tiny macOS menu bar app for Codex and Claude Code usage.
