@@ -63,9 +63,18 @@
     }
 
     .brand img {
-      width: 30px;
-      height: 30px;
-      border-radius: 8px;
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+    }
+
+    .hero-logo {
+      width: 132px;
+      height: 132px;
+      border-radius: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.46);
     }
 
     nav {
@@ -342,7 +351,6 @@
     <header>
       <a class="brand" href="./" aria-label="Coco Usage Bar home">
         <img src="assets/logo.png" alt="">
-        <span>Coco Usage Bar</span>
       </a>
       <nav aria-label="Links">
         <a href="https://github.com/adrientaravant/coco-usage-bar/releases/latest">Releases</a>
@@ -353,6 +361,7 @@
     <main>
       <section class="hero">
         <div>
+          <img class="hero-logo" src="assets/logo.png" alt="">
           <h1>Coco Usage Bar</h1>
           <p class="lead">A tiny native macOS app for checking Codex and Claude Code limit usage, plus 30-day token totals, without opening another dashboard.</p>
           <div class="actions">
