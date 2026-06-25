@@ -753,7 +753,7 @@ enum SnapshotCache {
     private static var cacheURL: URL {
         let fileManager = FileManager.default
         let support = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("CodexUsageBar", isDirectory: true)
+            .appendingPathComponent("CocoUsageBar", isDirectory: true)
         return support.appendingPathComponent("snapshot.json")
     }
 
@@ -979,6 +979,7 @@ final class UsageBarController: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        UpdaterController.shared.start()
         configureButton()
         if let cached = SnapshotCache.load() {
             render(cached)
@@ -993,7 +994,7 @@ final class UsageBarController: NSObject, NSApplicationDelegate {
         guard let button = statusItem.button else { return }
         button.attributedTitle = statusTitle(providers: [])
         button.font = NSFont.monospacedDigitSystemFont(ofSize: NSFont.systemFontSize, weight: .medium)
-        button.toolTip = "Codex and Claude Code local usage"
+        button.toolTip = "Coco Usage Bar: Codex and Claude Code usage"
     }
 
     @objc private func refreshFromMenu() {
@@ -1116,6 +1117,15 @@ final class UsageBarController: NSObject, NSApplicationDelegate {
             ),
             to: menu
         )
+
+        let updateItem = NSMenuItem(
+            title: "Check for Updates...",
+            action: #selector(UpdaterController.checkForUpdates(_:)),
+            keyEquivalent: ""
+        )
+        updateItem.target = UpdaterController.shared
+        updateItem.isEnabled = true
+        menu.addItem(updateItem)
 
         let quitItem = NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         quitItem.target = NSApp

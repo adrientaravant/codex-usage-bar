@@ -1,10 +1,10 @@
-# CodexUsageBar
+# Coco Usage Bar
 
 A tiny macOS menu bar app for Codex and Claude Code usage.
 
-Website: https://adrientaravant.github.io/codex-usage-bar/
+Website: https://adrientaravant.github.io/coco-usage-bar/
 
-Download: https://github.com/adrientaravant/codex-usage-bar/releases/latest/download/CodexUsageBar.zip
+Download: https://github.com/adrientaravant/coco-usage-bar/releases/latest/download/CocoUsageBar.dmg
 
 It stays small: no browser cookie scraping and no embedded web view. It reads local JSONL logs for token/cost usage, and reads Claude Code OAuth credentials from the local Claude Code Keychain item when available so it can show Claude limit percentages.
 
@@ -34,7 +34,7 @@ Menu:
 - Claude Code: `~/.claude/projects/**/*.jsonl`
 - Claude Code limits: Keychain item `Claude Code-credentials`, with `~/.claude/.credentials.json` fallback.
 
-The app caches the latest computed snapshot in `~/Library/Application Support/CodexUsageBar/snapshot.json`, then refreshes in the background so launch stays snappy.
+The app caches the latest computed snapshot in `~/Library/Application Support/CocoUsageBar/snapshot.json`, then refreshes in the background so launch stays snappy.
 
 ## Cost Notes
 
@@ -44,7 +44,7 @@ The menu intentionally does not show dollar estimates. Codex and Claude Code are
 - Claude Code estimates by model family when the local log line includes the model name.
 - Prompt cache reads/writes are estimated separately when the logs expose them.
 
-The price table remains local code in `Sources/CodexUsageBar/main.swift` for diagnostic snapshots, but it is not presented as spend in the menu.
+The price table remains local code in `Sources/CocoUsageBar/main.swift` for diagnostic snapshots, but it is not presented as spend in the menu.
 
 ## Install
 
@@ -76,13 +76,13 @@ Print a one-shot snapshot:
 
 Fast path:
 
-1. Open https://adrientaravant.github.io/codex-usage-bar/
+1. Open https://adrientaravant.github.io/coco-usage-bar/
 2. Click Download.
-3. Unzip `CodexUsageBar.zip`.
-4. Move `CodexUsageBar.app` to `/Applications`.
-5. Open it once.
+3. Open `CocoUsageBar.dmg`.
+4. Drag `Coco Usage Bar.app` to `/Applications`.
+5. Right-click > Open once if macOS asks for confirmation.
 
-The current public zip is ad-hoc signed, not Developer ID signed or notarized. macOS may require right-click > Open the first time. For a true one-click install with no Gatekeeper warning, publish a Developer ID signed and notarized release.
+The current public DMG uses Apple Development signing, not Developer ID signing or notarization. This matches the Slite Agent Bar free path: first install may need right-click > Open once; later updates are handled by Sparkle from GitHub Releases.
 
 Source install:
 
@@ -93,15 +93,21 @@ Source install:
 ./script/install.sh --login
 ```
 
-This builds locally, installs `/Applications/CodexUsageBar.app`, and adds it as a login item.
+This builds locally, installs `/Applications/Coco Usage Bar.app`, and adds it as a login item.
 
-You can also build a quick internal zip:
+You can also build a quick internal DMG + Sparkle zip:
 
 ```bash
 ./script/package.sh
 ```
 
-That writes `dist/CodexUsageBar.zip` and `dist/CodexUsageBar.zip.sha256`. Without a Developer ID certificate, macOS may warn teammates when they open the downloaded app. For a small internal group, the source-install path is smoother.
+That writes a release folder containing `CocoUsageBar.dmg`, a Sparkle update zip, and checksums. Without a Developer ID certificate, macOS may warn teammates when they open the downloaded app.
+
+Cut a Sparkle-capable release:
+
+```bash
+APP_VERSION=0.2.1 ./script/release.sh
+```
 
 Polished distribution:
 
