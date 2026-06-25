@@ -5,536 +5,530 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Coco Usage Bar</title>
   <meta name="description" content="A tiny macOS menu bar app for Codex and Claude Code usage.">
-  <link rel="icon" href="assets/logo.png">
+  <link rel="icon" href="assets/logo.webp" type="image/webp">
   <style>
     :root {
       color-scheme: dark;
-      --bg: oklch(8% 0.018 268);
-      --bg-2: oklch(12% 0.026 264);
-      --ink: oklch(96% 0.012 282);
-      --muted: oklch(73% 0.026 284);
-      --quiet: oklch(58% 0.025 284);
-      --line: oklch(100% 0 0 / 0.12);
-      --line-strong: oklch(100% 0 0 / 0.2);
-      --panel: oklch(14% 0.018 276 / 0.94);
-      --violet: oklch(70% 0.19 300);
-      --blue: oklch(66% 0.18 258);
-      --mint: oklch(78% 0.13 182);
-      --orange: oklch(72% 0.18 52);
-      --shadow: 0 32px 90px oklch(1% 0.01 280 / 0.52);
+      --bg-0: oklch(8.5% 0.02 266);
+      --bg-1: oklch(12.5% 0.028 268);
+      --ink: oklch(97% 0.01 280);
+      --muted: oklch(72% 0.022 282);
+      --quiet: oklch(56% 0.022 282);
+      --faint: oklch(46% 0.02 282);
+      --line: oklch(100% 0 0 / 0.1);
+      --line-2: oklch(100% 0 0 / 0.18);
+
+      /* popover + menu-bar materials (macOS vibrancy) */
+      --panel: oklch(17% 0.022 272 / 0.72);
+      --bar: oklch(20% 0.018 270 / 0.55);
+
+      /* brand accent — pulled from the Coco mascot, not a generic violet */
+      --coco: oklch(73% 0.16 52);
+      --coco-deep: oklch(64% 0.2 36);
+      --violet: oklch(67% 0.18 300);
+      --blue: oklch(66% 0.17 256);
+      --mint: oklch(80% 0.13 176);
+      --warn: oklch(71% 0.19 38);
+
+      --display: ui-rounded, "SF Pro Rounded", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    html {
-      background: var(--bg);
-    }
+    html { background: var(--bg-0); }
 
     body {
-      min-height: 100vh;
+      height: 100dvh;
       margin: 0;
-      background:
-        linear-gradient(145deg, oklch(21% 0.085 184 / 0.68) 0%, transparent 31%),
-        linear-gradient(26deg, transparent 0%, transparent 54%, oklch(32% 0.14 294 / 0.34) 100%),
-        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 56%, oklch(6% 0.014 270) 100%);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       color: var(--ink);
-      overflow-x: hidden;
+      background:
+        radial-gradient(118% 78% at 84% 4%, oklch(46% 0.14 46 / 0.20), transparent 54%),
+        radial-gradient(92% 72% at 6% 102%, oklch(36% 0.13 298 / 0.24), transparent 60%),
+        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 60%, oklch(6.5% 0.016 270) 100%);
     }
 
+    /* faint engineering grid, faded near the top edge */
     body::before {
       content: "";
       position: fixed;
       inset: 0;
+      z-index: 0;
       pointer-events: none;
       background-image:
-        linear-gradient(oklch(100% 0 0 / 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, oklch(100% 0 0 / 0.028) 1px, transparent 1px);
-      background-size: 92px 92px;
-      mask-image: linear-gradient(180deg, black 0%, transparent 72%);
+        linear-gradient(oklch(100% 0 0 / 0.028) 1px, transparent 1px),
+        linear-gradient(90deg, oklch(100% 0 0 / 0.022) 1px, transparent 1px);
+      background-size: 88px 88px;
+      mask-image: radial-gradient(120% 90% at 80% 0%, black, transparent 70%);
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
+    a { color: inherit; text-decoration: none; }
 
-    .wrap {
-      width: min(1180px, calc(100% - 40px));
-      margin: 0 auto;
+    /* ───────────────────────── menu bar ───────────────────────── */
+    .menubar {
       position: relative;
-    }
-
-    .site-header {
+      z-index: 5;
+      flex: none;
+      height: 34px;
       display: flex;
       align-items: center;
-      justify-content: flex-end;
-      gap: 24px;
-      padding: 28px 0 18px;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 0 16px;
+      border-bottom: 1px solid oklch(100% 0 0 / 0.07);
+      background: var(--bar);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      backdrop-filter: blur(22px) saturate(160%);
+      box-shadow: 0 1px 0 oklch(100% 0 0 / 0.04) inset;
+      font-size: 13px;
     }
 
-    nav {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 700;
-    }
+    .mb-left,
+    .mb-right { display: flex; align-items: center; gap: 4px; min-width: 0; }
+    .mb-right { gap: 10px; }
 
-    nav a {
-      min-height: 36px;
+    .mb-brand {
       display: inline-flex;
       align-items: center;
-      border: 1px solid transparent;
-      border-radius: 8px;
-      padding: 0 12px;
+      gap: 7px;
+      padding: 0 9px;
+      height: 24px;
+      font-weight: 800;
+      letter-spacing: 0.01em;
     }
+    .mb-brand img { width: 15px; height: 15px; border-radius: 4px; }
 
-    nav a:hover,
-    nav a:focus-visible {
+    .mb-item {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 10px;
+      border-radius: 6px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .mb-item:hover,
+    .mb-item:focus-visible {
       color: var(--ink);
-      border-color: var(--line);
-      background: oklch(100% 0 0 / 0.055);
+      background: oklch(100% 0 0 / 0.08);
       outline: none;
     }
 
-    main {
-      padding: clamp(38px, 6vw, 72px) 0 72px;
+    .mb-status { display: inline-flex; align-items: center; gap: 11px; color: var(--quiet); }
+    .mb-status svg { width: 16px; height: 16px; display: block; }
+
+    /* live coco pill — this is the menu-bar item the popover hangs from */
+    .mb-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      height: 24px;
+      padding: 0 11px;
+      border-radius: 7px;
+      background: oklch(100% 0 0 / 0.12);
+      box-shadow: 0 0 0 1px oklch(100% 0 0 / 0.06) inset;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .mb-pill .seg { display: inline-flex; align-items: center; gap: 6px; }
+    .mb-pill img { width: 14px; height: 14px; display: block; }
+    .mb-pill .dot { width: 3px; height: 3px; border-radius: 50%; background: oklch(100% 0 0 / 0.4); }
+
+    .mb-clock { color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    /* ───────────────────────── stage ───────────────────────── */
+    .stage {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .frame {
+      width: min(1200px, 100% - 48px);
+      height: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(18px, 3.4vh, 46px) 0 clamp(16px, 2.6vh, 30px);
+      gap: clamp(18px, 3vh, 38px);
     }
 
     .hero {
-      min-height: calc(100vh - 136px);
+      flex: 1;
+      min-height: 0;
       display: grid;
-      grid-template-columns: minmax(0, 1.02fr) minmax(420px, 0.98fr);
-      gap: clamp(42px, 6vw, 82px);
+      grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+      gap: clamp(36px, 5vw, 76px);
       align-items: center;
     }
 
-    .hero-copy {
-      padding-bottom: clamp(20px, 4vw, 54px);
-    }
+    /* ── left: copy ── */
+    .copy { align-self: center; }
 
-    .hero-logo-frame {
-      width: clamp(148px, 16vw, 196px);
-      margin: 0 0 clamp(30px, 4vw, 44px);
-      padding: 10px;
-      border: 1px solid var(--line-strong);
-      border-radius: clamp(34px, 4vw, 48px);
-      background: linear-gradient(180deg, oklch(100% 0 0 / 0.08), oklch(100% 0 0 / 0.015));
-      box-shadow: 0 34px 86px oklch(1% 0.014 280 / 0.5);
-    }
-
-    .hero-logo {
-      width: 100%;
-      height: auto;
+    .app-icon {
+      width: clamp(92px, 9vw, 128px);
+      height: clamp(92px, 9vw, 128px);
+      object-fit: cover;
+      margin: 0 0 clamp(18px, 2.4vh, 26px);
+      border-radius: 28px;
       display: block;
-      border-radius: clamp(28px, 3.2vw, 40px);
+      box-shadow: 0 16px 40px oklch(2% 0.01 280 / 0.5), 0 0 0 1px oklch(100% 0 0 / 0.08);
     }
 
     .eyebrow {
-      margin: 0 0 16px;
+      margin: 0 0 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       color: var(--mint);
-      font-size: 15px;
+      font-size: 12.5px;
       font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--mint);
+      box-shadow: 0 0 14px var(--mint);
     }
 
     h1 {
-      max-width: 720px;
       margin: 0;
-      font-family: ui-rounded, "SF Pro Rounded", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: clamp(58px, 10.8vw, 132px);
-      line-height: 0.88;
-      letter-spacing: 0;
+      max-width: 12ch;
+      font-family: var(--display);
+      font-size: clamp(46px, 6.4vw, 78px);
+      line-height: 0.92;
+      letter-spacing: -0.018em;
+      font-weight: 800;
+    }
+    h1 .grad {
+      color: var(--coco);
     }
 
     .lead {
-      max-width: 630px;
-      margin: 28px 0 0;
+      max-width: 44ch;
+      margin: clamp(16px, 2.4vh, 24px) 0 0;
       color: var(--muted);
-      font-size: clamp(18px, 2.1vw, 23px);
-      line-height: 1.48;
+      font-size: clamp(16px, 1.55vw, 18.5px);
+      line-height: 1.5;
     }
 
     .actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 34px;
+      gap: 11px;
+      margin-top: clamp(20px, 3vh, 30px);
     }
 
     .button {
-      min-height: 50px;
+      height: 46px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 9px;
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 11px;
       padding: 0 18px;
-      background: oklch(100% 0 0 / 0.06);
+      background: oklch(100% 0 0 / 0.05);
       color: var(--ink);
-      font-weight: 820;
-      transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), background 180ms ease, border-color 180ms ease;
+      font-size: 15px;
+      font-weight: 700;
+      transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
     }
-
+    .button svg { width: 17px; height: 17px; }
     .button:hover,
     .button:focus-visible {
       transform: translateY(-1px);
-      border-color: var(--line-strong);
+      border-color: var(--line-2);
       background: oklch(100% 0 0 / 0.085);
       outline: none;
     }
-
     .button.primary {
       border-color: transparent;
-      background: linear-gradient(135deg, var(--orange), var(--violet) 62%, var(--blue));
-      color: oklch(98% 0.01 282);
-      box-shadow: 0 18px 42px oklch(45% 0.18 290 / 0.26);
+      color: oklch(99% 0.01 70);
+      background: linear-gradient(135deg, var(--coco), var(--coco-deep) 90%);
+      box-shadow: 0 14px 34px oklch(58% 0.19 44 / 0.32);
+    }
+    .button.primary:hover,
+    .button.primary:focus-visible {
+      box-shadow: 0 18px 42px oklch(58% 0.19 44 / 0.42);
     }
 
-    .button svg {
-      width: 18px;
-      height: 18px;
-    }
-
-    .microcopy {
-      max-width: 590px;
-      margin: 18px 0 0;
-      color: var(--quiet);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .proof {
+    .meta {
+      margin: clamp(14px, 2vh, 20px) 0 0;
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 28px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 720;
-    }
-
-    .proof span {
-      display: inline-flex;
       align-items: center;
-      gap: 8px;
-      min-height: 34px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 0 11px;
-      background: oklch(100% 0 0 / 0.045);
+      gap: 7px 12px;
+      color: var(--faint);
+      font-size: 12.5px;
+      font-weight: 600;
     }
+    .meta b { color: var(--quiet); font-weight: 700; }
+    .meta .sep { width: 3px; height: 3px; border-radius: 50%; background: oklch(100% 0 0 / 0.22); }
 
-    .proof span::before {
-      content: "";
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--mint);
-      box-shadow: 0 0 18px var(--mint);
-    }
+    /* ── right: the popover, hanging from the pill ── */
+    .preview { align-self: start; justify-self: end; width: min(372px, 100%); }
 
-    .preview {
-      min-width: 0;
+    .popover {
       position: relative;
-      isolation: isolate;
+      border: 1px solid var(--line-2);
+      border-radius: 16px;
+      background:
+        linear-gradient(180deg, oklch(100% 0 0 / 0.05), transparent 24%),
+        var(--panel);
+      -webkit-backdrop-filter: blur(30px) saturate(150%);
+      backdrop-filter: blur(30px) saturate(150%);
+      box-shadow: 0 36px 90px oklch(1% 0.01 280 / 0.6), 0 2px 0 oklch(100% 0 0 / 0.05) inset;
+      padding: 16px 16px 13px;
     }
-
-    .preview::before {
+    /* up-tail pointing back toward the menu-bar pill */
+    .popover::before {
       content: "";
       position: absolute;
-      inset: 11% -8% auto auto;
-      width: 72%;
-      height: 42%;
-      z-index: -1;
-      background: linear-gradient(135deg, oklch(64% 0.21 300 / 0.26), oklch(74% 0.16 188 / 0.14));
-      filter: blur(44px);
-      transform: rotate(-8deg);
-    }
-
-    .menubar-pill {
-      width: max-content;
-      max-width: 100%;
-      margin: 0 auto -15px;
-      position: relative;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-height: 42px;
-      border: 1px solid oklch(100% 0 0 / 0.2);
-      border-radius: 22px;
-      padding: 0 17px;
-      background: linear-gradient(180deg, oklch(47% 0.1 286 / 0.92), oklch(38% 0.08 286 / 0.92));
-      box-shadow: 0 22px 70px oklch(1% 0.012 280 / 0.5);
-      font-size: 18px;
-      font-weight: 840;
-    }
-
-    .menubar-pill img {
-      width: 19px;
-      height: 19px;
-      display: block;
-    }
-
-    .menubar-pill .divider {
-      color: oklch(100% 0 0 / 0.38);
-      font-weight: 620;
-    }
-
-    .menu {
-      border: 1px solid var(--line-strong);
-      border-radius: 18px;
-      background:
-        linear-gradient(180deg, oklch(100% 0 0 / 0.045), transparent 32%),
-        var(--panel);
-      box-shadow: var(--shadow);
-      padding: clamp(22px, 3vw, 34px);
-    }
-
-    .provider {
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--line);
+      top: -6px;
+      right: 26px;
+      width: 12px; height: 12px;
+      background: var(--panel);
+      border-left: 1px solid var(--line-2);
+      border-top: 1px solid var(--line-2);
+      border-radius: 3px 0 0 0;
+      transform: rotate(45deg);
+      -webkit-backdrop-filter: blur(30px);
+      backdrop-filter: blur(30px);
     }
 
     .provider + .provider {
-      padding-top: 26px;
-    }
-
-    .provider-head,
-    .usage-row {
-      display: grid;
-      grid-template-columns: minmax(132px, 1fr) minmax(64px, 0.34fr) minmax(78px, 0.38fr);
-      gap: 16px;
-      align-items: center;
-    }
-
-    .provider-head {
-      margin-bottom: 18px;
-    }
-
-    .provider-name {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: clamp(21px, 2.4vw, 28px);
-      font-weight: 850;
-      letter-spacing: 0;
-    }
-
-    .provider-name img {
-      width: 22px;
-      height: 22px;
-      display: block;
-      opacity: 0.86;
-    }
-
-    .column-label {
-      color: var(--quiet);
-      font-size: 18px;
-      font-weight: 820;
-      text-align: right;
-    }
-
-    .usage-row {
-      min-height: 46px;
-      color: var(--ink);
-      font-size: clamp(19px, 2.2vw, 26px);
-      font-weight: 820;
-    }
-
-    .usage-row .value,
-    .usage-row .reset {
-      color: var(--muted);
-      text-align: right;
-      white-space: nowrap;
-    }
-
-    .usage-row .tokens {
-      grid-column: 2 / 4;
-      color: var(--muted);
-      text-align: right;
-      white-space: nowrap;
-    }
-
-    .menu-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding-top: 24px;
-      color: var(--muted);
-      font-size: clamp(16px, 1.8vw, 20px);
-      font-weight: 780;
-    }
-
-    .refresh {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--ink);
-    }
-
-    .refresh svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    .details {
-      display: grid;
-      grid-template-columns: 1.08fr 0.92fr 0.92fr;
-      gap: clamp(24px, 4vw, 48px);
-      margin-top: clamp(62px, 9vw, 104px);
-      padding-top: 26px;
+      margin-top: 14px;
+      padding-top: 14px;
       border-top: 1px solid var(--line);
     }
 
-    .detail {
-      min-width: 0;
+    .prov-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 76px 56px;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 9px;
+    }
+    .prov-name {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .prov-name img { width: 18px; height: 18px; display: block; }
+    .col-label {
+      color: var(--faint);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-align: right;
     }
 
-    .detail h2 {
-      margin: 0 0 12px;
-      font-family: ui-rounded, "SF Pro Rounded", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: clamp(22px, 2.4vw, 31px);
-      line-height: 1.05;
-      letter-spacing: 0;
+    .row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 76px 56px;
+      align-items: center;
+      gap: 12px;
+      height: 30px;
+      font-size: 14px;
     }
-
-    .detail p {
-      max-width: 36rem;
-      margin: 0;
+    .row .label { color: var(--muted); font-weight: 600; }
+    .row .used {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .row .track {
+      flex: 1;
+      height: 5px;
+      border-radius: 3px;
+      background: oklch(100% 0 0 / 0.1);
+      overflow: hidden;
+    }
+    .row .fill { height: 100%; border-radius: 3px; }
+    .row .fill.ok { background: linear-gradient(90deg, oklch(72% 0.12 188), var(--mint)); }
+    .row .fill.mid { background: linear-gradient(90deg, var(--coco-deep), var(--coco)); }
+    .row .fill.hot { background: linear-gradient(90deg, var(--coco-deep), var(--warn)); }
+    .row .pct {
+      min-width: 3.4ch;
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+    .row .reset {
       color: var(--muted);
-      font-size: 16px;
-      line-height: 1.58;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .row.span .spent {
+      grid-column: 2 / 4;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .row.span .spent b { color: var(--ink); font-weight: 600; }
+
+    .pop-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+      padding-top: 11px;
+      border-top: 1px solid var(--line);
+      color: var(--quiet);
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+    .pop-foot .updated { font-variant-numeric: tabular-nums; }
+    .pop-foot .refresh { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+    .pop-foot .refresh svg { width: 14px; height: 14px; }
+
+    /* ── bottom value band ── */
+    .band {
+      flex: none;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(20px, 3vw, 44px);
+      padding-top: clamp(16px, 2.2vh, 22px);
+      border-top: 1px solid var(--line);
+    }
+    .band-item { min-width: 0; }
+    .band-item h2 {
+      margin: 0 0 5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--display);
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .band-item h2 svg { width: 15px; height: 15px; color: var(--coco); flex: none; }
+    .band-item p {
+      margin: 0;
+      max-width: 34ch;
+      color: var(--quiet);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .band-item code {
+      color: oklch(82% 0.09 50);
+      font-family: var(--mono);
+      font-size: 0.92em;
     }
 
-    code {
-      color: oklch(85% 0.08 305);
-      font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
-      font-size: 0.94em;
+    /* ───────────────────────── motion ───────────────────────── */
+    @keyframes drop {
+      from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+      to   { opacity: 1; transform: none; }
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: none; }
+    }
+    .preview { animation: drop 520ms cubic-bezier(0.22, 1, 0.36, 1) both; transform-origin: 86% top; }
+    .copy { animation: rise 620ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+    .band { animation: rise 700ms 120ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+    /* ───────────────────────── responsive ───────────────────────── */
+    @media (max-height: 720px) {
+      .app-icon { width: 50px; height: 50px; border-radius: 14px; margin-bottom: 14px; }
+      h1 { font-size: clamp(42px, 5.4vw, 60px); }
+      .band-item p { display: none; }
+      .band-item h2 { font-size: 14px; }
     }
 
-    @media (max-width: 940px) {
+    @media (max-width: 920px) {
+      body { height: auto; min-height: 100dvh; overflow: auto; }
+      .mb-item { display: none; }
+      .mb-status { display: none; }
+      .stage { display: block; }
+      .frame { height: auto; }
       .hero {
-        min-height: auto;
         grid-template-columns: 1fr;
+        gap: 30px;
+        padding: 8px 0 4px;
       }
-
-      .hero-copy {
-        padding-bottom: 0;
-      }
-
-      .preview {
-        width: min(680px, 100%);
-      }
-
-      .details {
-        grid-template-columns: 1fr;
-      }
+      .copy { align-self: stretch; }
+      .preview { align-self: stretch; justify-self: stretch; width: min(420px, 100%); }
+      .popover::before { display: none; }
+      .band { grid-template-columns: 1fr; gap: 16px; }
+      .band-item p { display: block; }
     }
 
-    @media (max-width: 560px) {
-      .wrap {
-        width: min(100% - 28px, 1180px);
-      }
+    @media (max-width: 460px) {
+      .menubar { padding: 0 12px; }
+      .mb-brand span { display: none; }
+      .actions { flex-direction: column; align-items: stretch; }
+      .button { width: 100%; }
+    }
 
-      .site-header {
-        padding-top: 20px;
-      }
-
-      nav {
-        font-size: 13px;
-      }
-
-      nav a {
-        padding: 0 9px;
-      }
-
-      main {
-        padding-top: 28px;
-      }
-
-      .hero-logo-frame {
-        width: 132px;
-      }
-
-      .actions {
-        flex-direction: column;
-      }
-
-      .button {
-        width: 100%;
-      }
-
-      .menubar-pill {
-        min-height: 38px;
-        padding: 0 13px;
-        font-size: 16px;
-      }
-
-      .menu {
-        padding: 22px 16px 18px;
-        border-radius: 14px;
-      }
-
-      .provider-head,
-      .usage-row {
-        grid-template-columns: minmax(104px, 1fr) minmax(56px, 0.3fr) minmax(66px, 0.34fr);
-        gap: 10px;
-      }
-
-      .provider-name {
-        font-size: 20px;
-      }
-
-      .provider-name img {
-        width: 19px;
-        height: 19px;
-      }
-
-      .column-label {
-        font-size: 15px;
-      }
-
-      .usage-row {
-        min-height: 42px;
-        font-size: 18px;
-      }
-
-      .usage-row .tokens {
-        font-size: 17px;
-      }
-
-      .menu-footer {
-        font-size: 16px;
-      }
+    @media (prefers-reduced-motion: reduce) {
+      .preview, .copy, .band { animation: none; }
+      .button { transition: none; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="site-header">
-      <nav aria-label="Links">
-        <a href="https://github.com/adrientaravant/coco-usage-bar/releases/latest/download/CocoUsageBar.dmg">Download</a>
-        <a href="https://github.com/adrientaravant/coco-usage-bar/releases/latest">Releases</a>
-        <a href="https://github.com/adrientaravant/coco-usage-bar">GitHub</a>
-      </nav>
-    </header>
+  <!-- faux macOS menu bar: nav lives here as menu items; the live Coco pill anchors the popover -->
+  <div class="menubar">
+    <div class="mb-left">
+      <a class="mb-brand" href="https://github.com/adrientaravant/coco-usage-bar">
+        <img src="assets/logo.webp" width="15" height="15" alt="">Coco
+      </a>
+      <a class="mb-item" href="https://github.com/adrientaravant/coco-usage-bar/releases/latest/download/CocoUsageBar.dmg">Download</a>
+      <a class="mb-item" href="https://github.com/adrientaravant/coco-usage-bar/releases/latest">Releases</a>
+      <a class="mb-item" href="https://github.com/adrientaravant/coco-usage-bar">GitHub</a>
+    </div>
+    <div class="mb-right">
+      <span class="mb-status" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M2 8.5C7.5 3.5 16.5 3.5 22 8.5M5.5 12c4-3.6 9-3.6 13 0M9 15.5c1.8-1.6 4.2-1.6 6 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="19" r="1.3" fill="currentColor"/></svg>
+        <svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="8.5" width="16" height="7" rx="2" stroke="currentColor" stroke-width="1.6"/><rect x="4.3" y="10.3" width="10" height="3.4" rx="1" fill="currentColor"/><path d="M20.5 11v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </span>
+      <span class="mb-pill" aria-label="Coco usage: Codex 37 percent, Claude Code 21 percent">
+        <span class="seg"><img src="assets/codex-mark.png" alt="">37%</span>
+        <span class="dot"></span>
+        <span class="seg"><img src="assets/claude-mark.png" alt="">21%</span>
+      </span>
+      <span class="mb-clock">Tue 16:46</span>
+    </div>
+  </div>
 
-    <main>
+  <div class="stage">
+    <div class="frame">
       <section class="hero">
-        <div class="hero-copy">
-          <div class="hero-logo-frame">
-            <img class="hero-logo" src="assets/logo.png" alt="">
-          </div>
-          <p class="eyebrow">Open source macOS menu bar usage</p>
-          <h1>Coco Usage Bar</h1>
-          <p class="lead">Codex and Claude Code limits, reset times, 30-day tokens, and estimated cost, always one click away.</p>
+        <div class="copy">
+          <img class="app-icon" src="assets/logo.webp" width="384" height="384" alt="Coco Usage Bar app icon">
+          <p class="eyebrow">Open source · macOS menu bar</p>
+          <h1>Coco <span class="grad">Usage Bar</span></h1>
+          <p class="lead">Codex and Claude Code limits, reset times, 30-day tokens, and estimated cost, living in your menu bar one glance away.</p>
           <div class="actions">
             <a class="button primary" href="https://github.com/adrientaravant/coco-usage-bar/releases/latest/download/CocoUsageBar.dmg">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -545,45 +539,62 @@
             </a>
             <a class="button" href="https://github.com/adrientaravant/coco-usage-bar">View source</a>
           </div>
-          <p class="microcopy">macOS 14+. First install may need one approval because the public build uses free Apple Development signing. Updates arrive through Sparkle after that.</p>
-          <div class="proof" aria-label="Highlights">
-            <span>Native Swift</span>
-            <span>Local logs</span>
-            <span>No account server</span>
-          </div>
+          <p class="meta">
+            <b>macOS 14+</b><span class="sep"></span>
+            <span>Native Swift</span><span class="sep"></span>
+            <span>Auto-updates via Sparkle</span><span class="sep"></span>
+            <span>Free-signed build · one-time approve on first launch</span>
+          </p>
         </div>
 
-        <div class="preview" aria-label="Coco Usage Bar preview">
-          <div class="menubar-pill">
-            <img src="assets/codex-mark.png" alt="">
-            <span>37%</span>
-            <span class="divider">&middot;</span>
-            <img src="assets/claude-mark.png" alt="">
-            <span>21%</span>
-          </div>
-          <div class="menu">
+        <div class="preview" aria-label="Coco Usage Bar menu preview">
+          <div class="popover">
             <div class="provider">
-              <div class="provider-head">
-                <div class="provider-name"><img src="assets/codex-mark.png" alt="">Codex</div>
-                <div class="column-label">Used</div>
-                <div class="column-label">Reset</div>
+              <div class="prov-head">
+                <div class="prov-name"><img src="assets/codex-mark.png" alt="">Codex</div>
+                <div class="col-label">Used</div>
+                <div class="col-label">Reset</div>
               </div>
-              <div class="usage-row"><div>5h</div><div class="value">37%</div><div class="reset">16:51</div></div>
-              <div class="usage-row"><div>Weekly</div><div class="value">93%</div><div class="reset">2 Jul</div></div>
-              <div class="usage-row"><div>Last 30 days</div><div class="tokens">$272 est. &middot; 1.1B tokens</div></div>
+              <div class="row">
+                <span class="label">5h</span>
+                <span class="used"><span class="track"><span class="fill ok" style="width:37%"></span></span><span class="pct">37%</span></span>
+                <span class="reset">16:51</span>
+              </div>
+              <div class="row">
+                <span class="label">Weekly</span>
+                <span class="used"><span class="track"><span class="fill hot" style="width:93%"></span></span><span class="pct">93%</span></span>
+                <span class="reset">2 Jul</span>
+              </div>
+              <div class="row span">
+                <span class="label">Last 30 days</span>
+                <span class="spent"><b>$272</b> est. · 1.1B tokens</span>
+              </div>
             </div>
+
             <div class="provider">
-              <div class="provider-head">
-                <div class="provider-name"><img src="assets/claude-mark.png" alt="">Claude Code</div>
-                <div class="column-label">Used</div>
-                <div class="column-label">Reset</div>
+              <div class="prov-head">
+                <div class="prov-name"><img src="assets/claude-mark.png" alt="">Claude Code</div>
+                <div class="col-label">Used</div>
+                <div class="col-label">Reset</div>
               </div>
-              <div class="usage-row"><div>5h</div><div class="value">1%</div><div class="reset">17:59</div></div>
-              <div class="usage-row"><div>Weekly</div><div class="value">21%</div><div class="reset">27 Jun</div></div>
-              <div class="usage-row"><div>Last 30 days</div><div class="tokens">$1.6k est. &middot; 2.1B tokens</div></div>
+              <div class="row">
+                <span class="label">5h</span>
+                <span class="used"><span class="track"><span class="fill ok" style="width:4%"></span></span><span class="pct">1%</span></span>
+                <span class="reset">17:59</span>
+              </div>
+              <div class="row">
+                <span class="label">Weekly</span>
+                <span class="used"><span class="track"><span class="fill ok" style="width:21%"></span></span><span class="pct">21%</span></span>
+                <span class="reset">27 Jun</span>
+              </div>
+              <div class="row span">
+                <span class="label">Last 30 days</span>
+                <span class="spent"><b>$1.6k</b> est. · 2.1B tokens</span>
+              </div>
             </div>
-            <div class="menu-footer">
-              <span>Updated 16:46</span>
+
+            <div class="pop-foot">
+              <span class="updated">Updated 16:46</span>
               <span class="refresh">
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path d="M21 12a9 9 0 1 1-2.64-6.36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -596,21 +607,21 @@
         </div>
       </section>
 
-      <section class="details">
-        <div class="detail">
-          <h2>Built for the glance.</h2>
-          <p>The top bar stays tiny: provider icons plus percent used. Open it when you need reset times, monthly tokens, or estimated spend.</p>
+      <footer class="band">
+        <div class="band-item">
+          <h2><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.4" fill="currentColor"/></svg>Built for the glance</h2>
+          <p>Provider icons and percent used sit in your menu bar. Click for reset times, tokens, and spend.</p>
         </div>
-        <div class="detail">
-          <h2>Local by default.</h2>
-          <p>Coco reads Codex and Claude Code usage from local state and existing credentials. There is no hosted account system or analytics endpoint.</p>
+        <div class="band-item">
+          <h2><svg viewBox="0 0 24 24" fill="none"><rect x="4.5" y="10.5" width="15" height="9" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" stroke="currentColor" stroke-width="1.8"/></svg>Local by default</h2>
+          <p>Reads Codex and Claude Code state from local files. No hosted account, no analytics endpoint.</p>
         </div>
-        <div class="detail">
-          <h2>Easy to share.</h2>
-          <p>Teammates can download the DMG, or build from source with <code>./script/install.sh --login</code>. Releases include a Sparkle appcast for updates.</p>
+        <div class="band-item">
+          <h2><svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0 4 4m-4-4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Easy to share</h2>
+          <p>Hand over the DMG, or build from source with <code>./script/install.sh --login</code>.</p>
         </div>
-      </section>
-    </main>
+      </footer>
+    </div>
   </div>
 </body>
 </html>
