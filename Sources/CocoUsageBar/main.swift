@@ -3,6 +3,7 @@ import Foundation
 
 private let claudeOAuthCredentialsFile = ".claude/.credentials.json"
 private let claudeOAuthKeychainService = "Claude Code-credentials"
+private let feedbackEmail = "adrien.taravant@gmail.com"
 
 struct TokenWindow: Codable {
     var inputTokens: Int64 = 0
@@ -1001,6 +1002,30 @@ final class UsageBarController: NSObject, NSApplicationDelegate {
         refreshInBackground(force: true)
     }
 
+    @objc private func sendFeedbackFromMenu() {
+        var components = URLComponents()
+        components.scheme = "mailto"
+        components.path = feedbackEmail
+        components.queryItems = [
+            URLQueryItem(name: "subject", value: "Coco Usage Bar feedback"),
+            URLQueryItem(name: "body", value: feedbackEmailBody())
+        ]
+
+        guard let url = components.url else { return }
+        NSWorkspace.shared.open(url)
+    }
+
+    private func feedbackEmailBody() -> String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "unknown"
+        return """
+
+
+---
+Coco Usage Bar \(version) (\(build))
+"""
+    }
+
     private func refreshInBackground(force: Bool = false) {
         guard force || !isRefreshing else { return }
         isRefreshing = true
@@ -1126,6 +1151,16 @@ final class UsageBarController: NSObject, NSApplicationDelegate {
         updateItem.target = UpdaterController.shared
         updateItem.isEnabled = true
         menu.addItem(updateItem)
+
+        let feedbackItem = NSMenuItem(
+            title: "Send Feedback...",
+            action: #selector(sendFeedbackFromMenu),
+            keyEquivalent: ""
+        )
+        feedbackItem.target = self
+        feedbackItem.image = NSImage(systemSymbolName: "envelope", accessibilityDescription: "Send Feedback")
+        feedbackItem.isEnabled = true
+        menu.addItem(feedbackItem)
 
         let quitItem = NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         quitItem.target = NSApp

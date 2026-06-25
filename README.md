@@ -28,7 +28,7 @@ Menu:
 - Codex 5-hour and weekly limit windows when available.
 - Claude Code 5-hour and weekly limit windows when available from local Claude Code OAuth credentials.
 - Last 30 days tokens for each provider with local usage.
-- Refresh and Quit.
+- Refresh, Check for Updates, Send Feedback, and Quit.
 
 ## Data Sources
 
