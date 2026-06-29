@@ -962,37 +962,142 @@ private final class MenuCostRowView: NSView {
 }
 
 private final class MenuFooterView: NSView {
-    init(updatedText: String, target: AnyObject, refreshAction: Selector) {
-        super.init(frame: NSRect(x: 0, y: 0, width: MenuLayout.width, height: 36))
+    init(updatedText: String, target: AnyObject, refreshAction: Selector, feedbackAction: Selector) {
+        super.init(frame: NSRect(x: 0, y: 0, width: MenuLayout.width, height: 76))
+        wantsLayer = true
 
         let label = NSTextField(labelWithString: updatedText)
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .tertiaryLabelColor
         label.translatesAutoresizingMaskIntoConstraints = false
 
-        let refreshButton = NSButton(title: "Refresh", target: target, action: refreshAction)
-        refreshButton.font = .systemFont(ofSize: 13, weight: .semibold)
-        refreshButton.isBordered = false
-        refreshButton.image = NSImage(systemSymbolName: "arrow.clockwise", accessibilityDescription: "Refresh")
-        refreshButton.imagePosition = .imageLeading
-        refreshButton.contentTintColor = .labelColor
-        refreshButton.translatesAutoresizingMaskIntoConstraints = false
+        let refreshButton = FooterButton(
+            title: "Refresh",
+            symbolName: "arrow.clockwise",
+            target: target,
+            action: refreshAction
+        )
+        refreshButton.font = .systemFont(ofSize: 12.5, weight: .semibold)
+
+        let updateButton = FooterButton(
+            title: "Updates",
+            symbolName: "sparkles",
+            target: UpdaterController.shared,
+            action: #selector(UpdaterController.checkForUpdates(_:))
+        )
+        let feedbackButton = FooterButton(
+            title: "Feedback",
+            symbolName: "envelope",
+            target: target,
+            action: feedbackAction
+        )
+        let quitButton = FooterButton(
+            title: "Quit",
+            symbolName: "xmark.square",
+            target: NSApp,
+            action: #selector(NSApplication.terminate(_:)),
+            trailingText: "⌘Q"
+        )
+
+        let actions = NSStackView(views: [updateButton, feedbackButton, quitButton])
+        actions.orientation = .horizontal
+        actions.spacing = 6
+        actions.distribution = .fillEqually
+        actions.translatesAutoresizingMaskIntoConstraints = false
 
         addSubview(label)
         addSubview(refreshButton)
+        addSubview(actions)
 
         NSLayoutConstraint.activate([
             label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: MenuLayout.horizontalPadding),
-            label.centerYAnchor.constraint(equalTo: centerYAnchor),
+            label.topAnchor.constraint(equalTo: topAnchor, constant: 8),
 
             refreshButton.leadingAnchor.constraint(greaterThanOrEqualTo: label.trailingAnchor, constant: 18),
             refreshButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -MenuLayout.horizontalPadding),
-            refreshButton.centerYAnchor.constraint(equalTo: centerYAnchor)
+            refreshButton.centerYAnchor.constraint(equalTo: label.centerYAnchor),
+
+            actions.leadingAnchor.constraint(equalTo: leadingAnchor, constant: MenuLayout.horizontalPadding),
+            actions.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -MenuLayout.horizontalPadding),
+            actions.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 9),
+            actions.heightAnchor.constraint(equalToConstant: 30)
         ])
+    }
+
+    override var isFlipped: Bool { true }
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+        NSColor.separatorColor.withAlphaComponent(0.35).setStroke()
+        let path = NSBezierPath()
+        path.move(to: NSPoint(x: 0, y: 0.5))
+        path.line(to: NSPoint(x: bounds.width, y: 0.5))
+        path.stroke()
     }
 
     required init?(coder: NSCoder) {
         nil
+    }
+}
+
+private final class FooterButton: NSButton {
+    private let trailingText: String?
+
+    init(
+        title: String,
+        symbolName: String,
+        target: AnyObject,
+        action: Selector,
+        trailingText: String? = nil
+    ) {
+        self.trailingText = trailingText
+        super.init(frame: .zero)
+        self.title = title
+        self.target = target
+        self.action = action
+        image = NSImage(systemSymbolName: symbolName, accessibilityDescription: title)
+        imagePosition = .imageLeading
+        imageScaling = .scaleProportionallyDown
+        isBordered = false
+        bezelStyle = .regularSquare
+        font = .systemFont(ofSize: 12.5, weight: .medium)
+        contentTintColor = .secondaryLabelColor
+        alignment = .center
+        translatesAutoresizingMaskIntoConstraints = false
+        setButtonType(.momentaryChange)
+        wantsLayer = true
+        layer?.cornerRadius = 7
+        layer?.backgroundColor = NSColor.controlAccentColor.withAlphaComponent(0.001).cgColor
+        attributedTitle = makeTitle(title, trailingText: trailingText)
+    }
+
+    override func updateLayer() {
+        super.updateLayer()
+        layer?.backgroundColor = isHighlighted
+            ? NSColor.controlAccentColor.withAlphaComponent(0.14).cgColor
+            : NSColor.separatorColor.withAlphaComponent(0.16).cgColor
+    }
+
+    override func resetCursorRects() {
+        addCursorRect(bounds, cursor: .pointingHand)
+    }
+
+    required init?(coder: NSCoder) {
+        nil
+    }
+
+    private func makeTitle(_ title: String, trailingText: String?) -> NSAttributedString {
+        let result = NSMutableAttributedString(string: title, attributes: [
+            .font: NSFont.systemFont(ofSize: 12.5, weight: .medium),
+            .foregroundColor: NSColor.secondaryLabelColor
+        ])
+        if let trailingText {
+            result.append(NSAttributedString(string: "  \(trailingText)", attributes: [
+                .font: NSFont.monospacedDigitSystemFont(ofSize: 11.5, weight: .regular),
+                .foregroundColor: NSColor.tertiaryLabelColor
+            ]))
+        }
+        return result
     }
 }
 
@@ -1173,34 +1278,11 @@ Coco Usage Bar \(version) (\(build))
             MenuFooterView(
                 updatedText: "Updated \(timeOnly(snapshot.generatedAt))",
                 target: self,
-                refreshAction: #selector(refreshFromMenu)
+                refreshAction: #selector(refreshFromMenu),
+                feedbackAction: #selector(sendFeedbackFromMenu)
             ),
             to: menu
         )
-
-        let updateItem = NSMenuItem(
-            title: "Check for Updates...",
-            action: #selector(UpdaterController.checkForUpdates(_:)),
-            keyEquivalent: ""
-        )
-        updateItem.target = UpdaterController.shared
-        updateItem.isEnabled = true
-        menu.addItem(updateItem)
-
-        let feedbackItem = NSMenuItem(
-            title: "Send Feedback...",
-            action: #selector(sendFeedbackFromMenu),
-            keyEquivalent: ""
-        )
-        feedbackItem.target = self
-        feedbackItem.image = NSImage(systemSymbolName: "envelope", accessibilityDescription: "Send Feedback")
-        feedbackItem.isEnabled = true
-        menu.addItem(feedbackItem)
-
-        let quitItem = NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
-        quitItem.target = NSApp
-        quitItem.isEnabled = true
-        menu.addItem(quitItem)
 
         return menu
     }
