@@ -446,7 +446,7 @@
     .band {
       flex: none;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: clamp(20px, 3vw, 44px);
       padding-top: clamp(16px, 2.2vh, 22px);
       border-top: 1px solid var(--line);
@@ -645,10 +645,6 @@
         <div class="band-item">
           <h2><svg viewBox="0 0 24 24" fill="none"><rect x="4.5" y="10.5" width="15" height="9" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" stroke="currentColor" stroke-width="1.8"/></svg>Local by default</h2>
           <p>Reads Codex and Claude Code state from local files. No hosted account, no analytics endpoint.</p>
-        </div>
-        <div class="band-item">
-          <h2><svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0 4 4m-4-4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Easy to share</h2>
-          <p>Send the DMG link, open once if macOS asks, then Sparkle handles updates from GitHub Releases.</p>
         </div>
       </footer>
     </div>
