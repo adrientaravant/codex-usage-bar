@@ -229,16 +229,13 @@
     }
 
     .install-line {
-      display: grid;
-      grid-template-columns: auto minmax(260px, 1fr);
+      display: flex;
       align-items: center;
-      gap: 13px;
       margin-top: clamp(20px, 3vh, 30px);
       max-width: 720px;
     }
 
-    .download-pill,
-    .command-pill {
+    .download-pill {
       height: 54px;
       display: inline-flex;
       align-items: center;
@@ -262,40 +259,8 @@
       text-decoration-thickness: 1.5px;
     }
 
-    .command-pill {
-      min-width: 0;
-      gap: 10px;
-      justify-content: space-between;
-      padding: 0 14px 0 18px;
-      color: var(--ink);
-      background: oklch(22% 0.015 270 / 0.54);
-      -webkit-backdrop-filter: blur(24px) saturate(150%);
-      backdrop-filter: blur(24px) saturate(150%);
-      font-family: var(--mono);
-      font-size: clamp(12px, 1.05vw, 14px);
-      font-weight: 500;
-    }
-
-    .command-pill code {
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      color: inherit;
-      font: inherit;
-    }
-
-    .command-pill svg {
-      width: 20px;
-      height: 20px;
-      flex: none;
-      color: var(--muted);
-    }
-
     .download-pill:hover,
-    .download-pill:focus-visible,
-    .command-pill:hover,
-    .command-pill:focus-visible {
+    .download-pill:focus-visible {
       transform: translateY(-1px);
       border-color: var(--line-2);
       outline: none;
@@ -553,15 +518,12 @@
     @media (max-width: 460px) {
       .menubar { padding: 0 12px; }
       .mb-brand span { display: none; }
-      .install-line { grid-template-columns: 1fr; }
-      .download-pill,
-      .command-pill { width: 100%; }
+      .download-pill { width: 100%; }
     }
 
     @media (prefers-reduced-motion: reduce) {
       .preview, .copy, .band { animation: none; }
-      .download-pill,
-      .command-pill { transition: none; }
+      .download-pill { transition: none; }
     }
   </style>
 </head>
@@ -600,13 +562,6 @@
           <p class="lead">Codex and Claude Code limits, reset times, pace markers, and 30-day token volume, living in your menu bar one glance away.</p>
           <div class="install-line">
             <a class="download-pill" href="https://github.com/adrientaravant/coco-usage-bar/releases/latest/download/CocoUsageBar.dmg">Download for macOS</a>
-            <a class="command-pill" href="https://github.com/adrientaravant/coco-usage-bar" aria-label="View source install instructions">
-              <code>./script/install.sh --login</code>
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              </svg>
-            </a>
           </div>
           <p class="meta">
             <b>macOS 14+</b><span class="sep"></span>
@@ -693,7 +648,7 @@
         </div>
         <div class="band-item">
           <h2><svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0 4 4m-4-4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Easy to share</h2>
-          <p>Hand over the DMG, or build from source with <code>./script/install.sh --login</code>. Homebrew can join later.</p>
+          <p>Send the DMG link, open once if macOS asks, then Sparkle handles updates from GitHub Releases.</p>
         </div>
       </footer>
     </div>
