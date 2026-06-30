@@ -1767,6 +1767,12 @@ final class UsageBarController: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         UpdaterController.shared.start()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updaterStateDidChange),
+            name: UpdaterController.stateDidChangeNotification,
+            object: UpdaterController.shared
+        )
         configureButton()
         if let cached = SnapshotCache.load() {
             render(cached)
@@ -1786,6 +1792,11 @@ final class UsageBarController: NSObject, NSApplicationDelegate {
 
     @objc private func refreshFromMenu() {
         refreshInBackground(force: true)
+    }
+
+    @objc private func updaterStateDidChange() {
+        guard let latestSnapshot else { return }
+        statusItem.menu = menu(for: latestSnapshot)
     }
 
     @objc private func sendFeedbackFromMenu() {
@@ -2104,8 +2115,9 @@ Coco Usage Bar \(version) (\(build))
         refresh.target = self
         menu.addItem(refresh)
 
-        let update = NSMenuItem(title: "Check for Updates...", action: #selector(UpdaterController.checkForUpdates(_:)), keyEquivalent: "")
+        let update = NSMenuItem(title: UpdaterController.shared.menuTitle, action: #selector(UpdaterController.checkForUpdates(_:)), keyEquivalent: "")
         update.target = UpdaterController.shared
+        update.isEnabled = UpdaterController.shared.canCheckForUpdates
         menu.addItem(update)
 
         let feedback = NSMenuItem(title: "Send Feedback", action: #selector(sendFeedbackFromMenu), keyEquivalent: "")
