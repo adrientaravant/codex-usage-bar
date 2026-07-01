@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coco Design System — Styleguide</title>
+  <meta name="description" content="Living styleguide for the Coco Usage Bar design system: tokens, type, and components.">
+  <link rel="icon" href="assets/logo.webp" type="image/webp">
+  <link rel="stylesheet" href="coco-design.css">
+  <style>
+    /* styleguide chrome only — NOT part of the design system */
+    .sg-section { padding: clamp(40px, 7vh, 76px) 0; border-top: 1px solid var(--border); }
+    .sg-lead { max-width: 60ch; color: var(--muted); font-size: var(--fs-sub); }
+    .sg-h { font-family: var(--font-mono); font-weight: 600; font-size: 12px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--faint); margin: 0 0 24px; }
+    .sg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .swatch { border: 1px solid var(--border); }
+    .swatch .chip { height: 62px; }
+    .swatch .meta { padding: 9px 11px; font-family: var(--font-mono); font-size: 11.5px; }
+    .swatch .name { color: var(--ink); }
+    .swatch .val { color: var(--faint); margin-top: 2px; word-break: break-all; }
+    .sg-type-row { display: flex; align-items: baseline; gap: 18px; padding: 14px 0; border-top: 1px solid var(--border); flex-wrap: wrap; }
+    .sg-type-row:first-child { border-top: none; }
+    .sg-type-row .tag { flex: 0 0 auto; width: 120px; font-family: var(--font-mono); font-size: 11px;
+      color: var(--faint); letter-spacing: 0.08em; text-transform: uppercase; }
+    .sg-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+    .sg-panel { border: 1px solid var(--border); background: var(--surface); padding: 18px; }
+    .sg-mini { font-family: var(--font-mono); font-size: 12px; color: var(--quiet); margin: 0 0 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+    pre.sg-code { margin: 0; padding: 16px; border: 1px solid var(--border); background: var(--bg-2);
+      font-family: var(--font-mono); font-size: 12.5px; line-height: 1.7; color: var(--muted); overflow-x: auto; }
+    pre.sg-code .k { color: var(--coco-bright); }
+    .sg-note { font-family: var(--font-mono); font-size: 12px; color: var(--faint); margin-top: 14px; }
+    .menubar-demo { border: 1px solid var(--border); background: oklch(10% 0.016 300); }
+    .menubar-demo .bar { position: static; }
+  </style>
+</head>
+<body>
+  <!-- ── the menu bar, live ── -->
+  <header class="bar" id="bar">
+    <div class="bar-in">
+      <nav class="bar-group is-left">
+        <a class="wordmark" href="index.html"><img src="assets/logo.webp" width="17" height="17" alt="">coco<span class="cursor" aria-hidden="true"></span></a>
+        <a class="navlink" href="#tokens">Tokens</a>
+        <a class="navlink" href="#type">Type</a>
+        <a class="navlink" href="#components">Components</a>
+      </nav>
+      <div class="bar-group is-right">
+        <span class="pill" aria-label="Coco usage: Codex 47 percent, Claude Code 5 percent">
+          <span class="seg"><img src="assets/codex-mark.png" alt="">47%</span>
+          <span class="mid" aria-hidden="true"></span>
+          <span class="seg"><img src="assets/claude-mark.png" alt="">5%</span>
+        </span>
+        <span class="clock" id="clock" aria-hidden="true">Tue 16:46</span>
+        <a class="btn is-accent is-sm" href="index.html">Coco<span class="opt">&nbsp;site</span></a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── intro ── -->
+  <section class="wrap section">
+    <p class="eyebrow">Coco design system · v1</p>
+    <h1 class="display" style="max-width:20ch; margin-top:18px;">Hard corners,<br>live data<span class="cursor" aria-hidden="true"></span></h1>
+    <p class="sg-lead" style="margin-top:22px;">
+      One drop-in stylesheet — <code style="font-family:var(--font-mono);color:var(--coco-bright)">coco-design.css</code> —
+      distilled from the terminal-native landing page. Link it, then build with the tokens and classes below.
+    </p>
+    <ul style="margin-top:22px; padding-left:0; list-style:none; color:var(--muted); font-size:var(--fs-body); line-height:2;">
+      <li>— <b style="color:var(--ink)">Warm-violet near-black</b> canvas, never neutral, never orange.</li>
+      <li>— <b style="color:var(--ink)">Hard 90° corners</b> everywhere. <code style="font-family:var(--font-mono);color:var(--coco-bright)">--radius: 0</code> and it stays 0.</li>
+      <li>— <b style="color:var(--ink)">1px hairlines</b> divide; fills are nearly invisible.</li>
+      <li>— <b style="color:var(--ink)">Mono-first</b> — headlines, nav, eyebrows, and all data in Geist Mono.</li>
+      <li>— One violet <b style="color:var(--ink)">brand accent</b> + two data inks: <b style="color:var(--codex)">teal = Codex</b>, <b style="color:var(--claude)">amber = Claude Code</b>.</li>
+    </ul>
+  </section>
+
+  <!-- ── color tokens ── -->
+  <section class="wrap sg-section" id="tokens">
+    <p class="sg-h">Color tokens</p>
+
+    <p class="sg-mini">Canvas &amp; surfaces</p>
+    <div class="sg-grid">
+      <div class="swatch"><div class="chip" style="background:var(--bg)"></div><div class="meta"><div class="name">--bg</div><div class="val">oklch(8% .016 300)</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--bg-2)"></div><div class="meta"><div class="name">--bg-2</div><div class="val">oklch(6.5% .014 300)</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--surface)"></div><div class="meta"><div class="name">--surface</div><div class="val">oklch(12.5% .02 300)</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--surface-2)"></div><div class="meta"><div class="name">--surface-2</div><div class="val">oklch(15.5% .022 300)</div></div></div>
+    </div>
+
+    <p class="sg-mini" style="margin-top:26px;">Text</p>
+    <div class="sg-grid">
+      <div class="swatch"><div class="chip" style="background:var(--ink)"></div><div class="meta"><div class="name" style="color:var(--bg)">--ink</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--muted)"></div><div class="meta"><div class="name">--muted</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--quiet)"></div><div class="meta"><div class="name">--quiet</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--faint)"></div><div class="meta"><div class="name">--faint</div></div></div>
+    </div>
+
+    <p class="sg-mini" style="margin-top:26px;">Accent (brand) &amp; data ink</p>
+    <div class="sg-grid">
+      <div class="swatch"><div class="chip" style="background:var(--coco)"></div><div class="meta"><div class="name">--coco</div><div class="val">brand violet</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--coco-bright)"></div><div class="meta"><div class="name">--coco-bright</div><div class="val">links / accent text</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--codex)"></div><div class="meta"><div class="name">--codex</div><div class="val">teal · Codex</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--claude)"></div><div class="meta"><div class="name">--claude</div><div class="val">amber · Claude Code</div></div></div>
+    </div>
+  </section>
+
+  <!-- ── type ── -->
+  <section class="wrap sg-section" id="type">
+    <p class="sg-h">Type scale</p>
+    <div class="sg-type-row"><span class="tag">.display</span><span class="display" style="font-size:52px;">Know your limits</span></div>
+    <div class="sg-type-row"><span class="tag">.title</span><span class="title">Stop guessing</span></div>
+    <div class="sg-type-row"><span class="tag">.heading</span><span class="heading">Ahead of your burn rate?</span></div>
+    <div class="sg-type-row"><span class="tag">.subhead</span><span class="subhead">Codex and Claude Code usage, one glance away.</span></div>
+    <div class="sg-type-row"><span class="tag">.eyebrow</span><span class="eyebrow">Pace, not just percent</span></div>
+    <div class="sg-type-row"><span class="tag">body</span><span style="color:var(--muted); font-size:var(--fs-body);">Body copy is Geist sans — clarity where the mono carries character.</span></div>
+    <div class="sg-type-row"><span class="tag">mono data</span><span style="font-family:var(--font-mono); font-variant-numeric:tabular-nums; color:var(--ink);">47% used · reset 19:24 · 1.3B, 92% cached</span></div>
+    <p class="sg-note">Display / title / heading / eyebrow → <b style="color:var(--quiet)">Geist Mono</b>. Body &amp; subhead → <b style="color:var(--quiet)">Geist</b>.</p>
+  </section>
+
+  <!-- ── components ── -->
+  <section class="wrap sg-section" id="components">
+    <p class="sg-h">Components</p>
+
+    <p class="sg-mini">Buttons</p>
+    <div class="sg-row">
+      <a class="btn is-accent"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 20h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for macOS</a>
+      <a class="btn">View on GitHub</a>
+      <a class="btn is-accent is-sm">Small accent</a>
+      <a class="btn is-sm">Small</a>
+    </div>
+
+    <p class="sg-mini" style="margin-top:28px;">Pill · eyebrow · spec line</p>
+    <div class="sg-row">
+      <span class="pill"><span class="seg"><img src="assets/codex-mark.png" alt="">47%</span><span class="mid"></span><span class="seg"><img src="assets/claude-mark.png" alt="">5%</span></span>
+      <span class="eyebrow">At a glance</span>
+    </div>
+    <p class="specline" style="margin-top:16px;"><b>macOS 14+</b><span class="dot"></span><span>Native Swift</span><span class="dot"></span><span>MIT · open source</span></p>
+
+    <p class="sg-mini" style="margin-top:28px;">Menu bar</p>
+    <div class="menubar-demo">
+      <header class="bar">
+        <div class="bar-in">
+          <nav class="bar-group is-left">
+            <a class="wordmark"><img src="assets/logo.webp" width="17" height="17" alt="">coco<span class="cursor"></span></a>
+            <a class="navlink">Features</a><a class="navlink">How it works</a>
+          </nav>
+          <div class="bar-group is-right">
+            <span class="pill"><span class="seg"><img src="assets/codex-mark.png" alt="">47%</span><span class="mid"></span><span class="seg"><img src="assets/claude-mark.png" alt="">5%</span></span>
+            <span class="clock" style="display:inline-flex;">Tue 16:46</span>
+            <a class="btn is-accent is-sm">Download</a>
+          </div>
+        </div>
+      </header>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:28px; align-items:start;">
+      <div>
+        <p class="sg-mini">Gauge (signature)</p>
+        <div class="gauge-stage" style="width:100%;">
+          <div class="gauge">
+            <div class="gauge-head"><span>Usage</span><span class="live">Live</span></div>
+            <div class="prov">
+              <div class="prov-head"><span class="prov-name"><img src="assets/codex-mark.png" alt="">Codex</span><span class="prov-plan">pro</span></div>
+              <div class="win">
+                <div class="win-top"><span class="win-label">5h</span><span class="win-used"><b data-count="47">0</b>% used</span><span class="win-reset">reset <b>19:24</b></span></div>
+                <div class="rail" style="--v:47%; --p:54%; --c:var(--codex)"><span class="rail-fill"></span><span class="pace"></span></div>
+              </div>
+              <div class="win">
+                <div class="win-top"><span class="win-label">Weekly</span><span class="win-used"><b data-count="9">0</b>% used</span><span class="win-reset">reset <b>7 Jul</b></span></div>
+                <div class="rail" style="--v:9%; --p:15%; --c:var(--codex)"><span class="rail-fill"></span><span class="pace"></span></div>
+              </div>
+              <div class="tokens"><span>30d raw tokens</span><span><b>1.3B</b>, 92% cached <span class="chev">›</span></span></div>
+            </div>
+            <div class="prov">
+              <div class="prov-head"><span class="prov-name"><img src="assets/claude-mark.png" alt="">Claude Code</span><span class="prov-plan">Claude Max</span></div>
+              <div class="win">
+                <div class="win-top"><span class="win-label">5h</span><span class="win-used"><b data-count="5">0</b>% used</span><span class="win-reset">reset <b>18:40</b></span></div>
+                <div class="rail" style="--v:5%; --p:47%; --c:var(--claude)"><span class="rail-fill"></span><span class="pace"></span></div>
+              </div>
+              <div class="win">
+                <div class="win-top"><span class="win-label">Weekly</span><span class="win-used"><b data-count="7">0</b>% used</span><span class="win-reset">reset <b>4 Jul</b></span></div>
+                <div class="rail" style="--v:7%; --p:44%; --c:var(--claude)"><span class="rail-fill"></span><span class="pace"></span></div>
+              </div>
+              <div class="tokens"><span>30d raw tokens</span><span><b>2.8B</b>, 94% cached <span class="chev">›</span></span></div>
+            </div>
+            <div class="gauge-foot"><span>Updated 16:57</span><span>Refresh<kbd>⌘R</kbd></span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="sg-mini">Viz — window / code panel</p>
+        <div class="viz is-flush viz-window">
+          <div class="viz-titlebar"><span class="traffic"><i style="background:var(--tl-red)"></i><i style="background:var(--tl-yellow)"></i><i style="background:var(--tl-green)"></i></span>reads locally</div>
+<pre><span class="tok-comment"># Codex</span>
+<span class="tok-codex">~/.codex/sessions/</span>*.jsonl
+<span class="tok-codex">~/.codex/archived_sessions/</span>
+
+<span class="tok-comment"># Claude Code</span>
+<span class="tok-claude">~/.claude/projects/</span>*.jsonl
+<span class="tok-claude">~/.claude/.credentials.json</span>
+
+<span class="tok-accent">→</span> parsed on-device · nothing leaves your Mac</pre>
+        </div>
+        <p class="sg-mini" style="margin-top:24px;">Rails · data ink</p>
+        <div class="sg-panel">
+          <div class="rail is-filled" style="--v:47%; --p:54%; --c:var(--codex); height:8px;"><span class="rail-fill"></span><span class="pace"></span></div>
+          <div class="rail is-filled" style="--v:62%; --p:50%; --c:var(--claude); height:8px; margin-top:16px;"><span class="rail-fill"></span><span class="pace"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── usage ── -->
+  <section class="wrap sg-section">
+    <p class="sg-h">Use it</p>
+    <pre class="sg-code"><span class="k">&lt;link</span> rel=<span style="color:var(--codex)">"stylesheet"</span> href=<span style="color:var(--codex)">"coco-design.css"</span><span class="k">&gt;</span>
+
+<span class="k">&lt;header class=</span><span style="color:var(--codex)">"bar"</span><span class="k">&gt;</span> … menu bar … <span class="k">&lt;/header&gt;</span>
+<span class="k">&lt;section class=</span><span style="color:var(--codex)">"hero wrap"</span><span class="k">&gt;</span>
+  <span class="k">&lt;p class=</span><span style="color:var(--codex)">"eyebrow is-centered"</span><span class="k">&gt;</span>macOS menu bar<span class="k">&lt;/p&gt;</span>
+  <span class="k">&lt;h1 class=</span><span style="color:var(--codex)">"display"</span><span class="k">&gt;</span>Know your limits<span class="k">&lt;/h1&gt;</span>
+  <span class="k">&lt;a class=</span><span style="color:var(--codex)">"btn is-accent"</span><span class="k">&gt;</span>Download for macOS<span class="k">&lt;/a&gt;</span>
+<span class="k">&lt;/section&gt;</span></pre>
+    <p class="sg-note">Rails are per-instance: <code style="font-family:var(--font-mono);color:var(--coco-bright)">style="--v:47%; --p:54%; --c:var(--codex)"</code> — <code style="font-family:var(--font-mono);color:var(--coco-bright)">--v</code> fill, <code style="font-family:var(--font-mono);color:var(--coco-bright)">--p</code> pace tick, <code style="font-family:var(--font-mono);color:var(--coco-bright)">--c</code> provider ink. Add <code style="font-family:var(--font-mono);color:var(--coco-bright)">.is-filled</code> to a rail (or run the gauge script) to animate it.</p>
+  </section>
+
+  <footer class="foot">
+    <div class="foot-in">
+      <a class="wordmark" href="index.html"><img src="assets/logo.webp" width="17" height="17" alt="">coco</a>
+      <nav class="foot-links">
+        <a href="index.html">Landing</a>
+        <a href="coco-design.css">coco-design.css</a>
+        <a href="https://github.com/adrientaravant/coco-usage-bar">GitHub</a>
+      </nav>
+      <p class="foot-meta">Coco design system v1 · MIT · © 2026 Adrien</p>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var bar = document.getElementById("bar");
+      window.addEventListener("scroll", function () { bar.classList.toggle("is-stuck", window.scrollY > 6); }, { passive: true });
+
+      var clock = document.getElementById("clock");
+      var days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+      function tick(){ var d=new Date(); clock.textContent = days[d.getDay()]+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+      tick(); setInterval(tick, 15000);
+
+      var rails = document.querySelectorAll(".gauge .rail");
+      var nums = document.querySelectorAll(".gauge [data-count]");
+      if (reduce) { rails.forEach(function(r){ r.classList.add("is-filled"); }); nums.forEach(function(n){ n.textContent = n.getAttribute("data-count"); }); return; }
+      function countUp(el){ var t=parseInt(el.getAttribute("data-count"),10),s=null; function step(ts){ if(s===null)s=ts; var p=Math.min((ts-s)/1000,1); el.textContent=Math.round((1-Math.pow(1-p,3))*t); if(p<1)requestAnimationFrame(step);} requestAnimationFrame(step); }
+      requestAnimationFrame(function(){ rails.forEach(function(r){ r.classList.add("is-filled"); }); nums.forEach(countUp); });
+    })();
+  </script>
+</body>
+</html>

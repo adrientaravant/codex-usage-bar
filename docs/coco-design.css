@@ -1,0 +1,452 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@400;450;500;600&display=swap');
+
+/* ============================================================================
+   COCO DESIGN SYSTEM  ·  v1
+   Distilled from docs/alt.html — the terminal-native, hard-cornered direction.
+
+   HOW TO USE
+     <link rel="stylesheet" href="coco-design.css">
+     …then build with the tokens (var(--…)) and component classes below.
+     A page is: <header class="bar">…  <section class="hero wrap">…  etc.
+
+   THE FIVE RULES (what makes it Coco, not a generic dark dev-tool)
+     1. Warm-VIOLET near-black canvas — not neutral, not warm-orange.
+     2. Hard 90° corners on EVERYTHING. --radius is 0 and stays 0.
+     3. 1px hairline borders (--border); fills are nearly invisible (--fill).
+     4. Mono-first. Headlines, nav, eyebrows, and all data are Geist Mono.
+     5. One brand accent (violet) + two data inks (teal = Codex, amber = Claude).
+        Teal/amber appear ONLY inside data (rails, gauges); violet is brand/UI.
+
+   FONTS load from Google Fonts above. To honor Coco's "no network" ethos,
+   self-host Geist / Geist Mono and delete the @import — the fallback stacks in
+   --font-mono / --font-sans keep the page intact either way.
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* ── canvas: warm-violet near-black ─────────────────────────────────── */
+  --bg:        oklch(8% 0.016 300);   /* page */
+  --bg-2:      oklch(6.5% 0.014 300); /* footer / deepest */
+  --surface:   oklch(12.5% 0.02 300); /* panels, cards, gauge */
+  --surface-2: oklch(15.5% 0.022 300);/* nested cells */
+
+  /* ── text ───────────────────────────────────────────────────────────── */
+  --ink:   oklch(96% 0.006 300);      /* headings, primary */
+  --muted: oklch(72% 0.018 300);      /* body, subheads */
+  --quiet: oklch(58% 0.018 300);      /* labels, captions */
+  --faint: oklch(47% 0.016 300);      /* meta, hints */
+
+  /* ── lines & fills (the hairline system) ────────────────────────────── */
+  --border:   oklch(100% 0 0 / 0.10); /* default 1px divider */
+  --border-2: oklch(100% 0 0 / 0.17); /* emphasized edge (buttons, gauge) */
+  --fill:     oklch(100% 0 0 / 0.035);/* faint panel wash */
+  --fill-2:   oklch(100% 0 0 / 0.06); /* hover wash */
+  --track:    oklch(100% 0 0 / 0.10); /* progress-rail background */
+
+  /* ── brand accent: Coco violet (from the app icon) ──────────────────── */
+  --coco:        oklch(72% 0.17 300); /* CTA tint, glow, wordmark cursor */
+  --coco-bright: oklch(82% 0.16 302); /* accent text, links, hover */
+  --coco-deep:   oklch(60% 0.20 305); /* pressed / deep */
+
+  /* ── data ink: two providers, exactly as the app colors them ────────── */
+  --codex:  oklch(80% 0.13 176);      /* teal  — Codex */
+  --claude: oklch(79% 0.13 62);       /* amber — Claude Code */
+
+  /* macOS traffic lights (window-chrome accents) */
+  --tl-red:    #ff5f57;
+  --tl-yellow: #febc2e;
+  --tl-green:  #28c840;
+
+  /* ── type families ──────────────────────────────────────────────────── */
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* ── type scale (fluid) ─────────────────────────────────────────────── */
+  --fs-display: clamp(42px, 8.2vw, 92px); /* hero headline (mono) */
+  --fs-title:   clamp(30px, 5vw, 56px);   /* closing headline (mono) */
+  --fs-h2:      clamp(23px, 2.7vw, 33px); /* section heading (mono) */
+  --fs-sub:     clamp(15.5px, 1.5vw, 19px);/* hero subhead (sans) */
+  --fs-body:    15.5px;                    /* body copy (sans) */
+  --fs-data:    12.5px;                    /* numbers / mono UI */
+  --fs-eyebrow: 12px;                      /* uppercase mono kicker */
+
+  --tracking-display: -0.045em;            /* tight tracking for big mono */
+  --tracking-h2:      -0.025em;
+
+  /* ── spacing scale ──────────────────────────────────────────────────── */
+  --s1: 6px;  --s2: 10px; --s3: 16px; --s4: 24px;
+  --s5: 36px; --s6: 56px; --s7: 88px;
+  --pad-section: clamp(48px, 9vh, 104px);  /* vertical section rhythm */
+
+  /* ── geometry & motion ──────────────────────────────────────────────── */
+  --radius: 0;                             /* the signature — never round it */
+  --edge:   min(1200px, 100% - 44px);      /* content column width */
+  --ease:   cubic-bezier(0.22, 1, 0.36, 1);
+  --dur:    640ms;
+}
+
+@media (max-width: 460px) { :root { --edge: min(1200px, 100% - 32px); } }
+
+/* ============================================================================
+   BASE
+   ========================================================================== */
+* { box-sizing: border-box; }
+
+html { background: var(--bg); scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* violet ambient lighting from the top, echoing (not copying) superset's glow */
+  background:
+    radial-gradient(120% 60% at 50% -8%, oklch(46% 0.15 302 / 0.20), transparent 60%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg) 70%, var(--bg-2) 100%);
+  background-attachment: fixed;
+}
+
+a { color: inherit; text-decoration: none; }
+::selection { background: oklch(72% 0.17 300 / 0.32); }
+:focus-visible { outline: 2px solid var(--coco-bright); outline-offset: 3px; border-radius: var(--radius); }
+
+/* ============================================================================
+   LAYOUT PRIMITIVES
+   ========================================================================== */
+.wrap    { width: var(--edge); margin: 0 auto; }
+.section { padding: var(--pad-section) 0; }
+
+/* eyebrow — uppercase mono kicker with a short accent rule */
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-eyebrow); font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--quiet);
+}
+.eyebrow::before { content: ""; width: 16px; height: 1px; background: color-mix(in oklch, var(--coco) 70%, transparent); }
+.eyebrow.is-centered { justify-content: center; }
+.eyebrow.is-centered::before { display: none; }
+
+/* ============================================================================
+   TYPE UTILITIES
+   ========================================================================== */
+.display {
+  margin: 0; font-family: var(--font-mono); font-weight: 500;
+  font-size: var(--fs-display); line-height: 0.98; letter-spacing: var(--tracking-display);
+  color: var(--ink);
+}
+.title {
+  margin: 0; font-family: var(--font-mono); font-weight: 500;
+  font-size: var(--fs-title); line-height: 1.02; letter-spacing: -0.04em;
+}
+.heading {
+  margin: 0; font-family: var(--font-mono); font-weight: 500;
+  font-size: var(--fs-h2); line-height: 1.08; letter-spacing: var(--tracking-h2);
+  color: var(--ink);
+}
+.subhead {
+  margin: 0; color: var(--muted); font-size: var(--fs-sub); line-height: 1.55;
+}
+.subhead b { color: var(--ink); font-weight: 600; }
+.accent { color: var(--coco-bright); }
+
+/* blinking block cursor — the "live typing" motif for headlines/wordmark */
+.cursor {
+  display: inline-block; width: 0.5em; height: 0.86em; margin-left: 0.06em;
+  vertical-align: -0.06em; background: var(--coco);
+  animation: blink 1.1s steps(1) infinite;
+}
+
+/* ============================================================================
+   BUTTONS — hard corners, ghost-tint (violet) or outline
+   ========================================================================== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 50px; padding: 0 22px;
+  border: 1px solid var(--border-2); background: transparent; color: var(--ink);
+  font-family: var(--font-mono); font-size: 15px; font-weight: 500;
+  white-space: nowrap; cursor: pointer; border-radius: var(--radius);
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.btn:hover  { background: var(--fill-2); border-color: oklch(100% 0 0 / 0.28); }
+.btn:active { transform: translateY(1px); }
+.btn svg    { width: 15px; height: 15px; display: block; }
+
+.btn.is-accent {
+  color: var(--coco-bright);
+  border-color: color-mix(in oklch, var(--coco) 42%, transparent);
+  background: color-mix(in oklch, var(--coco) 11%, transparent);
+}
+.btn.is-accent:hover {
+  background: color-mix(in oklch, var(--coco) 18%, transparent);
+  border-color: color-mix(in oklch, var(--coco) 60%, transparent);
+}
+.btn.is-sm { height: 30px; padding: 0 13px; font-size: 12.5px; }
+
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.cta-row.is-centered { justify-content: center; }
+@media (max-width: 460px) { .cta-row .btn { width: 100%; } }
+
+/* spec line — inline mono meta with dot separators */
+.specline {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 7px 12px;
+  font-family: var(--font-mono); font-size: var(--fs-data); font-weight: 450; color: var(--faint);
+}
+.specline.is-centered { justify-content: center; }
+.specline b { color: var(--quiet); font-weight: 500; }
+.specline .dot { width: 3px; height: 3px; background: oklch(100% 0 0 / 0.20); }
+
+/* ============================================================================
+   MENU BAR (nav)  — the page's nav performs the product
+   ========================================================================== */
+.bar {
+  position: sticky; top: 0; z-index: 50; height: 46px;
+  border-bottom: 1px solid transparent; background: transparent;
+  transition: background 240ms ease, border-color 240ms ease, backdrop-filter 240ms ease;
+}
+.bar.is-stuck {
+  background: oklch(9% 0.016 300 / 0.72); border-bottom-color: var(--border);
+  -webkit-backdrop-filter: blur(16px) saturate(150%); backdrop-filter: blur(16px) saturate(150%);
+}
+.bar-in { width: var(--edge); height: 100%; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.bar-group { display: flex; align-items: center; min-width: 0; }
+.bar-group.is-left  { gap: 2px; }
+.bar-group.is-right { gap: 10px; }
+
+.wordmark {
+  display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px 0 4px;
+  font-family: var(--font-mono); font-weight: 600; font-size: 15px; letter-spacing: -0.01em;
+}
+.wordmark img { width: 17px; height: 17px; border-radius: 4px; display: block; }
+.wordmark .cursor { width: 8px; height: 16px; margin-left: -2px; vertical-align: 0; }
+
+.navlink {
+  display: none; align-items: center; height: 28px; padding: 0 11px;
+  color: var(--muted); font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+}
+.navlink:hover { color: var(--ink); background: var(--fill-2); }
+
+/* live usage pill — the menu-bar readout */
+.pill {
+  display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 10px;
+  border: 1px solid var(--border); background: var(--fill);
+  font-family: var(--font-mono); font-size: 12.5px; font-weight: 500;
+  font-variant-numeric: tabular-nums; color: var(--muted);
+}
+.pill .seg { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); }
+.pill img  { width: 13px; height: 13px; display: block; }
+.pill .mid { width: 3px; height: 3px; background: oklch(100% 0 0 / 0.32); }
+
+.clock {
+  font-family: var(--font-mono); font-size: 12.5px; font-weight: 500;
+  font-variant-numeric: tabular-nums; color: var(--quiet); padding-left: 2px;
+  display: none;
+}
+@media (min-width: 760px) { .navlink { display: inline-flex; } .clock { display: inline-flex; } }
+@media (max-width: 860px) { .bar .pill { display: none; } }
+@media (max-width: 460px) { .bar .btn .opt { display: none; } }
+
+/* ============================================================================
+   GAUGE — the signature: a live telemetry panel
+   Provider → windows (5h / weekly) → rail + pace tick → tokens
+   ========================================================================== */
+.gauge-stage { position: relative; width: min(560px, 100%); }
+.gauge-stage::before {                    /* violet lighting behind the panel */
+  content: ""; position: absolute; inset: -18% -22% 8%; z-index: 0;
+  background: radial-gradient(64% 60% at 50% 24%, oklch(56% 0.19 302 / 0.30), transparent 72%);
+  filter: blur(12px); pointer-events: none;
+}
+.gauge {
+  position: relative; z-index: 1; text-align: left;
+  border: 1px solid var(--border-2);
+  background: linear-gradient(180deg, oklch(100% 0 0 / 0.04), transparent 24%), var(--surface);
+  box-shadow: 0 40px 90px -30px oklch(2% 0.02 300 / 0.9), 0 0 0 1px oklch(100% 0 0 / 0.03) inset;
+}
+.gauge-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 15px; border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--faint);
+}
+.gauge-head .live { display: inline-flex; align-items: center; gap: 7px; color: var(--quiet); }
+.gauge-head .live::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--codex); box-shadow: 0 0 8px var(--codex); animation: pulse 2.4s ease-in-out infinite;
+}
+
+.prov { padding: 15px 15px 16px; }
+.prov + .prov { border-top: 1px solid var(--border); }
+.prov-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
+.prov-name { display: flex; align-items: center; gap: 9px; font-family: var(--font-mono); font-size: 14.5px; font-weight: 600; color: var(--ink); }
+.prov-name img { width: 16px; height: 16px; display: block; }
+.prov-plan {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--faint); border: 1px solid var(--border); padding: 3px 7px;
+}
+
+.win { margin-top: 13px; }
+.win:first-of-type { margin-top: 0; }
+.win-top { display: grid; grid-template-columns: 46px 1fr auto; align-items: baseline; gap: 10px;
+  font-family: var(--font-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.win-label { color: var(--muted); font-weight: 500; }
+.win-used  { color: var(--quiet); }
+.win-used b { color: var(--ink); font-weight: 600; }
+.win-reset { color: var(--faint); text-align: right; white-space: nowrap; }
+.win-reset b { color: var(--quiet); font-weight: 500; }
+
+/* rail — hard-cornered progress with a projected "pace" tick.
+   Set per-instance: style="--v:47%; --p:54%; --c:var(--codex)" */
+.rail { position: relative; height: 6px; margin-top: 8px; background: var(--track); overflow: hidden; }
+.rail-fill { display: block; height: 100%; width: 0; background: var(--c, var(--coco));
+  box-shadow: 0 0 12px -2px var(--c, var(--coco)); transition: width 1100ms var(--ease); }
+.rail.is-filled .rail-fill { width: var(--v); }
+.pace { position: absolute; top: -2px; left: var(--p); width: 2px; height: 10px;
+  background: oklch(96% 0.006 300 / 0.85); transform: translateX(-1px); opacity: 0;
+  transition: opacity 400ms ease 900ms; }
+.rail.is-filled .pace { opacity: 1; }
+
+.tokens { display: flex; align-items: center; justify-content: space-between; margin-top: 14px;
+  padding-top: 12px; border-top: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 12.5px; color: var(--quiet); }
+.tokens b { color: var(--ink); font-weight: 600; }
+.tokens .chev { color: var(--faint); }
+
+.gauge-foot { display: flex; align-items: center; justify-content: space-between; padding: 11px 15px;
+  border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 12px;
+  color: var(--faint); font-variant-numeric: tabular-nums; }
+kbd { font-family: var(--font-mono); font-size: 11px; color: var(--quiet);
+  border: 1px solid var(--border); padding: 1px 5px; margin-left: 6px; }
+
+/* ============================================================================
+   HERO
+   ========================================================================== */
+.hero { position: relative; padding: clamp(56px, 12vh, 128px) 0 clamp(40px, 7vh, 84px); text-align: center; }
+.hero .display { margin: 20px auto 0; max-width: 16ch; }
+.hero .subhead { margin: clamp(20px, 3vh, 30px) auto 0; max-width: 62ch; }
+.hero .cta-row { margin: clamp(26px, 4vh, 38px) auto 0; }
+.hero .specline { margin: 20px auto 0; }
+.hero .gauge-stage { margin: clamp(44px, 7vh, 82px) auto 0; }
+.hero .display .cursor { width: 0.46em; }
+
+/* ============================================================================
+   FEATURE ROWS — alternating two-column (text / visual)
+   ========================================================================== */
+.feature-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 76px); align-items: center;
+  padding: clamp(34px, 6vh, 68px) 0; border-top: 1px solid var(--border);
+}
+.feature-row:first-child { border-top: none; }
+.feature-row .eyebrow { margin-bottom: 16px; }
+.feature-row .heading + p, .feature-row p.body { margin: 16px 0 0; max-width: 42ch; color: var(--muted); font-size: var(--fs-body); line-height: 1.6; }
+.feature-row p.body code, .feature-row .heading + p code {
+  font-family: var(--font-mono); font-size: 0.88em; color: var(--coco-bright);
+  background: color-mix(in oklch, var(--coco) 10%, transparent); padding: 1px 5px;
+}
+.feature-row.is-flipped .row-text { order: 2; }
+.feature-row.is-flipped .row-viz  { order: 1; }
+@media (max-width: 860px) {
+  .feature-row { grid-template-columns: 1fr; gap: 26px; padding: 40px 0; }
+  .feature-row.is-flipped .row-text { order: 1; }
+  .feature-row.is-flipped .row-viz  { order: 2; }
+}
+
+/* ── viz: hard-cornered mini-diagram panels (Coco's functional "texture") ── */
+.viz {
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, oklch(100% 0 0 / 0.03), transparent 40%), var(--surface);
+  padding: 22px;
+}
+.viz.is-flush { padding: 0; overflow: hidden; }   /* for code/window panels */
+
+/* code / local-files panel with window chrome */
+.viz-window .viz-titlebar {
+  display: flex; align-items: center; gap: 7px; padding: 10px 14px; border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 11.5px; color: var(--faint); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.traffic { display: inline-flex; gap: 6px; margin-right: 6px; }
+.traffic i { width: 10px; height: 10px; border-radius: 50%; }
+.viz-window pre { margin: 0; padding: 16px 16px 18px; font-family: var(--font-mono);
+  font-size: 12.5px; line-height: 1.85; color: var(--muted); overflow-x: auto; }
+.viz-window pre .tok-codex  { color: var(--codex); }
+.viz-window pre .tok-claude { color: var(--claude); }
+.viz-window pre .tok-comment{ color: var(--faint); }
+.viz-window pre .tok-accent { color: var(--coco-bright); }
+
+/* ── feature-viz variants — functional mini-diagrams, Coco's "texture" ──── */
+.feature-rows { padding: clamp(48px, 9vh, 104px) 0 clamp(20px, 4vh, 44px); }
+
+.viz-cap { margin-top: 16px; text-align: center; letter-spacing: 0.02em;
+  font-family: var(--font-mono); font-size: 12px; color: var(--faint); }
+
+/* viz-bar: a cropped menu-bar strip */
+.viz-bar { display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+  background: oklch(10% 0.016 300); border: 1px solid var(--border); }
+.viz-bar .spacer { flex: 1; }
+.viz-bar .gicon { width: 15px; height: 15px; color: var(--faint); }
+.viz-bar .pill { height: 26px; }
+
+/* viz-pace: the pace-marker explainer */
+.viz-pace .plabel { display: flex; justify-content: space-between; margin-bottom: 10px;
+  font-family: var(--font-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--muted); }
+.viz-pace .plabel b { color: var(--ink); font-weight: 600; }
+.viz-pace .bigrail { position: relative; height: 12px; background: var(--track); overflow: hidden; }
+.viz-pace .bigrail i { position: absolute; inset: 0 auto 0 0; width: 47%; background: var(--codex); box-shadow: 0 0 16px -2px var(--codex); }
+.viz-pace .bigrail .p { position: absolute; top: -4px; left: 58%; width: 2px; height: 20px; background: oklch(96% 0.006 300 / 0.9); }
+.viz-pace .keys { display: flex; gap: 18px; margin-top: 16px; font-family: var(--font-mono); font-size: 11.5px; color: var(--faint); }
+.viz-pace .keys span { display: inline-flex; align-items: center; gap: 7px; }
+.viz-pace .keys .sw { width: 12px; height: 4px; }
+.viz-pace .keys .sw.is-used { background: var(--codex); }
+.viz-pace .keys .sw.is-pace { width: 2px; height: 12px; background: oklch(96% 0.006 300 / 0.9); }
+
+/* viz-grid: two providers × two windows */
+.viz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+.viz-grid .cell { background: var(--surface); padding: 15px 15px 16px; }
+.viz-grid .ct { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+  font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.viz-grid .ct b { color: var(--ink); font-weight: 600; }
+.viz-grid .cr { height: 5px; background: var(--track); overflow: hidden; }
+.viz-grid .cr i { display: block; height: 100%; }
+
+/* ============================================================================
+   CLOSING + FOOTER
+   ========================================================================== */
+.close { text-align: center; padding: clamp(64px, 12vh, 132px) 0 clamp(56px, 10vh, 108px);
+  border-top: 1px solid var(--border); margin-top: clamp(40px, 7vh, 80px); }
+.close .title { margin: 0 auto; max-width: 18ch; }
+.close .cta-row { margin-top: 30px; }
+.close .specline { margin-top: 22px; }
+
+.foot { border-top: 1px solid var(--border); background: var(--bg-2); }
+.foot-in { width: var(--edge); margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: space-between; gap: 16px; padding: 26px 0 30px; }
+.foot .wordmark { padding-left: 0; }
+.foot-links { display: flex; flex-wrap: wrap; gap: 20px; }
+.foot-links a { font-family: var(--font-mono); font-size: 13px; color: var(--quiet); }
+.foot-links a:hover { color: var(--ink); }
+.foot-meta { width: 100%; padding-top: 4px; font-family: var(--font-mono); font-size: 12px; color: var(--faint); }
+
+/* ============================================================================
+   MOTION
+   ========================================================================== */
+@keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes riseIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+.rise    { animation: riseIn var(--dur) var(--ease) both; }
+.rise-1  { animation-delay: 60ms; }
+.rise-2  { animation-delay: 130ms; }
+.rise-3  { animation-delay: 200ms; }
+.rise-4  { animation-delay: 280ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .cursor, .gauge-head .live::before { animation: none; }
+  .rail-fill, .pace { transition: none; }
+  .rise { animation: none; }
+}
